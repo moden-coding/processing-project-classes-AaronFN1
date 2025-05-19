@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import processing.core.*;
 
 public class App extends PApplet {
@@ -6,10 +8,17 @@ public class App extends PApplet {
     }
 
     Ship ship;
+    ArrayList<Laser> lasers = new ArrayList<>();
+    boolean upPressed;
+    boolean downPressed;
+    boolean leftPressed;
+    boolean rightPressed;
+    boolean rotating;
+    boolean shooting;
 
     public void setup() {
         background(0);
-        ship = new Ship(600, 400, 5, .2, 40, 35, 70, this);
+        ship = new Ship(600, 400, .2, 35, 35, 75, this);
     }
 
     public void settings() {
@@ -18,8 +27,32 @@ public class App extends PApplet {
 
     public void draw() {
         background(0);
+        for (int i = 0; i < lasers.size(); i++) {
+            Laser l = lasers.get(i);
+            l.update();
+            l.display();
+            if (l.isOffScreen()) {
+                lasers.remove(i);
+            }
+
+        }
         ship.display();
         ship.movement();
+        if (upPressed && rotating == false){
+            ship.moveUp();
+        }
+        if (downPressed && rotating == false){
+            ship.moveDown();
+        }
+        if (leftPressed){
+            ship.rotateLeft();
+        }
+        if (rightPressed){
+            ship.rotateRight();
+        }
+        if (shooting){
+            lasers.add(new Laser(ship.getX(), ship.getY(), ship.getRotation(), ship.getSpeed(), this));
+        }
     }
 
     public void mousePressed() {
@@ -29,17 +62,41 @@ public class App extends PApplet {
 
     public void keyPressed() {
         if (key == 'w' || keyCode == UP) {
-            ship.moveUp();
+            upPressed = true;
         }
         if (key == 's' || keyCode == DOWN) {
-            ship.moveDown();
-            ship.rotate(45);
+            downPressed = true;
         }
         if (key == 'a' || keyCode == LEFT) {
-            ship.moveLeft();
+            leftPressed = true;
+            rotating = true;
         }
         if (key == 'd' || keyCode == RIGHT) {
-            ship.moveRight();
+            rightPressed = true;
+            rotating = true;
+        }
+        if (key == ' ') {
+            shooting = true;
+        }
+    }
+
+    public void keyReleased() {
+        if (key == 'w' || keyCode == UP) {
+            upPressed = false;
+        }
+        if (key == 's' || keyCode == DOWN) {
+            downPressed = false;
+        }
+        if (key == 'a' || keyCode == LEFT) {
+            leftPressed = false;
+            rotating = false;
+        }
+        if (key == 'd' || keyCode == RIGHT) {
+            rightPressed = false;
+            rotating = false;
+        }
+        if (key == ' ') {
+            shooting = false;
         }
     }
 }

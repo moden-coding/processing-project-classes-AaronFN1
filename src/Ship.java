@@ -2,133 +2,110 @@ import processing.core.PApplet;
 
 public class Ship {
     private PApplet canvas;
-    private int x;
-    private int y;
-    private double xVelocity;
-    private double yVelocity;
-    private double velocity;
-    private double xAcceleration;
-    private double yAcceleration;
-    private double acceleration;
-    private int xDirection;
-    private int yDirection;
-    private double maxVelocity;
-    private int xSize;
-    private int ySize;
+    private float x, y;
+    private float xVelocity, yVelocity;
+    private float velocity;
+    private float maxVelocity;
+    private int xSize, ySize;
+    private float rotationAngle;
+    private float speed;
+    private double friction;
 
-    public Ship(int shipX, int shipY, double shipVelocity, double shipAcceleration, double shipMaxVelocity,
+    public Ship(int shipX, int shipY, double shipVelocity, double shipMaxVelocity,
             int shipXSize, int shipYSize, PApplet c) {
         canvas = c;
         x = shipX;
         y = shipY;
-        velocity = shipVelocity;
-        acceleration = shipAcceleration;
-        maxVelocity = shipMaxVelocity;
+        velocity = (float) shipVelocity;
+        maxVelocity = (float) shipMaxVelocity;
         xSize = shipXSize;
         ySize = shipYSize;
         xVelocity = 0;
         yVelocity = 0;
-        xDirection = 0;
-        yDirection = 0;
-        xAcceleration = 0;
-        yAcceleration = 0;
+        rotationAngle = 0;
+        friction = 0.995;
     }
 
     public void display() {
+        canvas.pushMatrix();
+        canvas.translate(x, y);
+        canvas.rotate(rotationAngle);
+
         canvas.fill(255);
-        canvas.rect(x, y, xSize, ySize);
+        canvas.stroke(255);
+        canvas.strokeWeight(2);
+
+        canvas.rectMode(PApplet.CENTER);
+        canvas.rect(0, 0, xSize, ySize);
+
+        canvas.popMatrix();
     }
 
-    //#region moving
     public void moveUp() {
-        if (yVelocity > -maxVelocity) {
-            yVelocity -= velocity;
-            yDirection--;
-        }
-        if (yDirection < 0) {
-            yAcceleration = acceleration;
-        }
+        float angle = rotationAngle - PApplet.HALF_PI;
+        xVelocity += Math.cos(angle) * velocity;
+        yVelocity += Math.sin(angle) * velocity;
+        limitSpeed();
     }
 
     public void moveDown() {
-        if (yVelocity < maxVelocity) {
-            yVelocity += velocity;
-            yDirection++;
-        }
-        if (yDirection > 0) {
-            yAcceleration = -acceleration;
-        }
+        xVelocity *= 0.9;
+        yVelocity *= 0.9;
+
+        if (canvas.abs(xVelocity) < 0.05)
+            xVelocity = 0;
+        if (canvas.abs(yVelocity) < 0.05)
+            yVelocity = 0;
     }
 
-    public void moveLeft() {
-        if (xVelocity > -maxVelocity) {
-            xVelocity -= velocity;
-            xDirection--;
-        }
-        if (xDirection < 0) {
-            xAcceleration = acceleration;
-        }
+    public void rotateLeft() {
+        rotationAngle -= 0.05f;
     }
 
-    public void moveRight() {
-        if (xVelocity < maxVelocity) {
-            xVelocity += velocity;
-            xDirection++;
-        }
-        if (xDirection > 0) {
-            xAcceleration = -acceleration;
-        }
+    public void rotateRight() {
+        rotationAngle += 0.05f;
     }
 
     public void movement() {
-        if (xDirection > 1 || xDirection <-1) {
-            xVelocity += xAcceleration;
-        }
-        if (yDirection > 1 || yDirection <-1) {
-            yVelocity += yAcceleration;
-        }
         x += xVelocity;
         y += yVelocity;
-        // #region acceleration velocity and direction resetting
-        if (yDirection < 0 && yVelocity > 0) {
-            yAcceleration = 0;
-            yVelocity = 0;
-        }
-        if (yDirection > 0 && yVelocity < 0) {
-            yAcceleration = 0;
-            yVelocity = 0;
-        }
-        if (xDirection < 0 && xVelocity > 0) {
-            xAcceleration = 0;
-            xVelocity = 0;
-        }
-        if (xDirection > 0 && xVelocity < 0) {
-            xAcceleration = 0;
-            xVelocity = 0;
-        }
-        if (yVelocity == 0) {
-            yDirection = 0;
-            yAcceleration = 0;
-        }
-        if (xVelocity == 0) {
-            xDirection = 0;
-            xAcceleration = 0;
-        }
-        // #endregion
-        // #region ship edge reset
-        if (y > 800 + ySize / 2) {
-            y = 0 - ySize / 2;
-        }
-        if (y < 0 - ySize) {
-            y = 800 + ySize / 2;
-        }
-        if (x > 1200 + xSize / 2) {
+
+        xVelocity *= friction;
+        yVelocity *= friction;
+
+        // Screen wrapping
+        if (x > 1200 + xSize / 2)
             x = 0 - xSize / 2;
-        }
-        if (x < 0 - xSize) {
+        if (x < 0 - xSize / 2)
             x = 1200 + xSize / 2;
-        }
-        // #endregion
+        if (y > 800 + ySize / 2)
+            y = 0 - ySize / 2;
+        if (y < 0 - ySize / 2)
+            y = 800 + ySize / 2;
     }
-    //#endregion
+
+    private void limitSpeed() {
+        speed = PApplet.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
+        if (speed > maxVelocity) {
+            float scale = maxVelocity / speed;
+            xVelocity *= scale;
+            yVelocity *= scale;
+        }
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getRotation() {
+        return rotationAngle;
+    }
 }
