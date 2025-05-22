@@ -8,7 +8,6 @@ public class Ship {
     private float maxVelocity;
     private int xSize, ySize;
     private float rotationAngle;
-    private float speed;
     private double friction;
 
     public Ship(int shipX, int shipY, double shipVelocity, double shipMaxVelocity,
@@ -48,9 +47,9 @@ public class Ship {
         limitSpeed();
     }
 
-    public void moveDown() {
-        xVelocity *= 0.9;
-        yVelocity *= 0.9;
+    public void brake() {
+        xVelocity *= 0.95;
+        yVelocity *= 0.95;
 
         if (canvas.abs(xVelocity) < 0.05)
             xVelocity = 0;
@@ -74,27 +73,30 @@ public class Ship {
         yVelocity *= friction;
 
         // Screen wrapping
-        if (x > 1200 + xSize / 2)
+        if (x > 1200 + xSize / 2) {
             x = 0 - xSize / 2;
-        if (x < 0 - xSize / 2)
+        }
+        if (x < 0 - xSize / 2) {
             x = 1200 + xSize / 2;
-        if (y > 800 + ySize / 2)
+        }
+        if (y > 800 + ySize / 2) {
             y = 0 - ySize / 2;
-        if (y < 0 - ySize / 2)
+        }
+        if (y < 0 - ySize / 2) {
             y = 800 + ySize / 2;
+        }
     }
 
     private void limitSpeed() {
-        speed = PApplet.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
-        if (speed > maxVelocity) {
-            float scale = maxVelocity / speed;
+        if (getSpeed() > maxVelocity) {
+            float scale = maxVelocity / getSpeed();
             xVelocity *= scale;
             yVelocity *= scale;
         }
     }
 
     public float getSpeed() {
-        return speed;
+        return PApplet.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
     }
 
     public float getX() {

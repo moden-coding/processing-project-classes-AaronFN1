@@ -12,17 +12,17 @@ public class Laser {
         x = startX;
         y = startY;
         angle = rotationAngle - PApplet.HALF_PI;
-        if (speed > 5){
+        if (speed > 8){
         velocity = speed;
         }
         else {
-            velocity = 5;
+            velocity = 8;
         }
         dx = (float) Math.cos(angle) * velocity;
         dy = (float) Math.sin(angle) * velocity;
     }
 
-    public void update() {
+    public void shoot() {
         x += dx;
         y += dy;
     }
