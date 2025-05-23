@@ -85,10 +85,7 @@ public class App extends PApplet {
             }
             if (shooting) {
                 if (!justShot) {
-                    for (int l = 0; l < 10; l++) {
-                        Laser laser = new Laser(ship.getX() + 4 * l * sin(ship.getRotation()), ship.getY() - 4 * l * cos(ship.getRotation()), ship.getRotation(), ship.getSpeed(), this);
-                        lasers.add(laser);
-                    }
+                    //add laserbeam class
                     justShot = true;
                 }
             }
