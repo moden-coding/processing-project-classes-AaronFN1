@@ -48,17 +48,28 @@ public class App extends PApplet {
         }
         for (int i = 0; i < lasers.size(); i++) {
             Laser l = lasers.get(i);
-            if (play) {
+            // if (play) {
                 l.shoot();
-            }
+            // }
             l.display();
+            for (int a = 0; a < asteroids.size(); a++) {
+                Asteroid r = asteroids.get(a);
+                if (r.colllide(l.getX(), l.getY())){
+                    for (i = 0; i <10; i++){
+                        lasers.remove(l);
+                    }
+                    asteroids.remove(r);
+                    for (int n = 0; n < 2; n++)
+                    asteroids.add(new Asteroid(r.getX(), r.getY(), r.getSpeed(), r.getSize()/2, random(TWO_PI), this));
+                }
+            }
             if (l.isOffScreen()) {
                 lasers.remove(i);
             }
 
         }
         ship.display();
-        if (play) {
+        // if (play) {
             ship.movement();
             if (upPressed && rotating == false) {
                 ship.moveUp();
@@ -81,7 +92,7 @@ public class App extends PApplet {
                     justShot = true;
                 }
             }
-        }
+        // }
     }
 
     public void mousePressed() {
@@ -105,6 +116,25 @@ public class App extends PApplet {
         }
         if (key == ' ') {
             shooting = true;
+        }
+        if (key == 'r'){
+            for (int a = 0; a < asteroids.size(); a++) {
+                Asteroid r = asteroids.get(a);
+                asteroids.remove(r);
+            }
+            for (int i = 0; i < 5; i++) {
+            float startX = randomX();
+            float startY = randomY();
+            float speed = random(1, 3);
+            float size = random(40, 70);
+            float angle = random(TWO_PI);
+            Asteroid asteroid = new Asteroid(startX, startY, speed, size, angle, this);
+            asteroids.add(asteroid);
+            }
+            for (int i = 0; i < lasers.size(); i++) {
+            Laser l = lasers.get(i);
+            lasers.remove(l);
+            }
         }
     }
 

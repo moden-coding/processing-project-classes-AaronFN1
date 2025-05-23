@@ -36,4 +36,12 @@ public class Laser {
     public boolean isOffScreen() {
         return x < 0 || x > 1200 || y < 0 || y > 800;
     }
+
+    public float getX(){
+        return x;
+    }
+
+    public float getY(){
+        return y;
+    }
 }

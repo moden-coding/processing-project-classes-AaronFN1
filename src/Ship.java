@@ -40,6 +40,19 @@ public class Ship {
         canvas.popMatrix();
     }
 
+    // public void reset(){
+    //     x = 0;
+    //     y = 0;
+    //     velocity = (float) shipVelocity;
+    //     maxVelocity = (float) shipMaxVelocity;
+    //     xSize = shipXSize;
+    //     ySize = shipYSize;
+    //     xVelocity = 0;
+    //     yVelocity = 0;
+    //     rotationAngle = 0;
+    //     friction = 0.995;
+    // }
+
     public void moveUp() {
         float angle = rotationAngle - PApplet.HALF_PI;
         xVelocity += Math.cos(angle) * velocity;

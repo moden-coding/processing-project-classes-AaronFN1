@@ -19,7 +19,7 @@ public class Asteroid {
         xDirection = PApplet.cos(angle) * speed;
         yDirection = PApplet.sin(angle) * speed;
         this.size = size;
-       
+
     }
 
     public void movement() {
@@ -47,15 +47,27 @@ public class Asteroid {
         canvas.circle(x, y, size);
     }
 
-    public float getX(){
+    public boolean colllide(float x, float y) {
+        if ((canvas.dist(x, y, this.x, this.y)) <= size/2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public float getX() {
         return x;
     }
 
-    public float getY(){
+    public float getY() {
         return y;
     }
 
-    public float getSize(){
+    public float getSize() {
         return size;
+    }
+
+    public float getSpeed() {
+        return speed;
     }
 }
