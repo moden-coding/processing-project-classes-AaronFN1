@@ -41,9 +41,7 @@ public class Asteroid {
     }
 
     public void display() {
-        canvas.noFill();
-        canvas.stroke(150);
-        canvas.strokeWeight(2);
+        canvas.fill(150);
         canvas.circle(x, y, size);
     }
 

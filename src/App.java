@@ -8,8 +8,10 @@ public class App extends PApplet {
     }
 
     Ship ship;
-    ArrayList<Laser> lasers = new ArrayList<>();
+    Laser laser;
+    // ArrayList<Laser> lasers = new ArrayList<>();
     ArrayList<Asteroid> asteroids = new ArrayList<>();
+    ArrayList<Laserbeam> laserbeams = new ArrayList<>();
     boolean upPressed;
     boolean downPressed;
     boolean leftPressed;
@@ -42,54 +44,50 @@ public class App extends PApplet {
         for (int a = 0; a < asteroids.size(); a++) {
             Asteroid r = asteroids.get(a);
             r.display();
-            if (play){
-            r.movement();
+            if (play) {
+                r.movement();
             }
         }
-        for (int i = 0; i < lasers.size(); i++) {
-            Laser l = lasers.get(i);
-            // if (play) {
-                l.shoot();
-            // }
+
+        for (int i = 0; i < laserbeams.size(); i++) {
+            Laserbeam l = laserbeams.get(i);
+            if (play) {
+            l.shoot();
+            }
             l.display();
             for (int a = 0; a < asteroids.size(); a++) {
                 Asteroid r = asteroids.get(a);
-                if (r.colllide(l.getX(), l.getY())){
-                    for (i = 0; i <10; i++){
-                        lasers.remove(l);
-                    }
+                if (r.colllide(l.getX(), l.getY())) {
+                    laserbeams.remove(l);
                     asteroids.remove(r);
                     for (int n = 0; n < 2; n++)
-                    asteroids.add(new Asteroid(r.getX(), r.getY(), r.getSpeed(), r.getSize()/2, random(TWO_PI), this));
+                        asteroids.add(
+                                new Asteroid(r.getX(), r.getY(), r.getSpeed(), r.getSize() / 2, random(TWO_PI), this));
                 }
             }
-            if (l.isOffScreen()) {
-                lasers.remove(i);
-            }
-
         }
         ship.display();
         // if (play) {
-            ship.movement();
-            if (upPressed && rotating == false) {
-                ship.moveUp();
+        ship.movement();
+        if (upPressed && rotating == false) {
+            ship.moveUp();
+        }
+        if (downPressed) {
+            ship.brake();
+        }
+        if (leftPressed) {
+            ship.rotateLeft();
+        }
+        if (rightPressed) {
+            ship.rotateRight();
+        }
+        if (shooting) {
+            if (!justShot) {
+                Laserbeam laserbeam = new Laserbeam(ship, laser, this);
+                laserbeams.add(laserbeam);
+                justShot = true;
             }
-            if (downPressed) {
-                ship.brake();
-            }
-            if (leftPressed) {
-                ship.rotateLeft();
-            }
-            if (rightPressed) {
-                ship.rotateRight();
-            }
-            if (shooting) {
-                if (!justShot) {
-                    //add laserbeam class
-                    justShot = true;
-                }
-            }
-        // }
+        }
     }
 
     public void mousePressed() {
@@ -114,24 +112,25 @@ public class App extends PApplet {
         if (key == ' ') {
             shooting = true;
         }
-        if (key == 'r'){
+        if (key == 'r') {
             for (int a = 0; a < asteroids.size(); a++) {
                 Asteroid r = asteroids.get(a);
                 asteroids.remove(r);
             }
+            for (int i = 0; i < laserbeams.size(); i++) {
+                Laserbeam l = laserbeams.get(i);
+                laserbeams.remove(l);
+            }
             for (int i = 0; i < 5; i++) {
-            float startX = randomX();
-            float startY = randomY();
-            float speed = random(1, 3);
-            float size = random(40, 70);
-            float angle = random(TWO_PI);
-            Asteroid asteroid = new Asteroid(startX, startY, speed, size, angle, this);
-            asteroids.add(asteroid);
+                float startX = randomX();
+                float startY = randomY();
+                float speed = random(1, 3);
+                float size = random(40, 70);
+                float angle = random(TWO_PI);
+                Asteroid asteroid = new Asteroid(startX, startY, speed, size, angle, this);
+                asteroids.add(asteroid);
             }
-            for (int i = 0; i < lasers.size(); i++) {
-            Laser l = lasers.get(i);
-            lasers.remove(l);
-            }
+            
         }
     }
 

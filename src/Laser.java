@@ -12,12 +12,7 @@ public class Laser {
         x = startX;
         y = startY;
         angle = rotationAngle - PApplet.HALF_PI;
-        if (speed > 8){
-        velocity = speed;
-        }
-        else {
-            velocity = 8;
-        }
+        velocity = speed + 8;
         dx = (float) Math.cos(angle) * velocity;
         dy = (float) Math.sin(angle) * velocity;
     }
@@ -28,20 +23,23 @@ public class Laser {
     }
 
     public void display() {
-        canvas.stroke(255, 0, 0);
-        canvas.strokeWeight(4);
-        canvas.point(x, y);
+        for (int i = 0; i < 10; i++) {
+            canvas.stroke(255, 0, 0);
+            canvas.strokeWeight(4);
+            canvas.point(x, y);
+        }
+
     }
 
     public boolean isOffScreen() {
         return x < 0 || x > 1200 || y < 0 || y > 800;
     }
 
-    public float getX(){
+    public float getX() {
         return x;
     }
 
-    public float getY(){
+    public float getY() {
         return y;
     }
 }
