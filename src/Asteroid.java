@@ -9,6 +9,8 @@ public class Asteroid {
     private float size;
     private float angle;
     private float speed;
+    private float viableSize;
+    private float smallestSize;
 
     public Asteroid(float startX, float startY, float speed, float size, float angle, PApplet c) {
         canvas = c;
@@ -19,7 +21,8 @@ public class Asteroid {
         xDirection = PApplet.cos(angle) * speed;
         yDirection = PApplet.sin(angle) * speed;
         this.size = size;
-
+        viableSize = 30;
+        smallestSize = 5;
     }
 
     public void movement() {
@@ -41,12 +44,20 @@ public class Asteroid {
     }
 
     public void display() {
-        canvas.fill(150);
+        if (size >= viableSize){
+            canvas.noStroke();
+            canvas.fill(150);
+        }
+        else{
+            canvas.strokeWeight(3);
+            canvas.stroke(150);
+            canvas.noFill();
+        }
         canvas.circle(x, y, size);
     }
 
-    public boolean colllide(float x, float y) {
-        if ((canvas.dist(x, y, this.x, this.y)) <= size/2) {
+    public boolean colllide(float distance) {
+        if (distance <= size/2) {
             return true;
         } else {
             return false;
@@ -63,6 +74,14 @@ public class Asteroid {
 
     public float getSize() {
         return size;
+    }
+
+    public float getViableSize() {
+        return viableSize;
+    }
+
+    public float getSmallestSize() {
+        return smallestSize;
     }
 
     public float getSpeed() {

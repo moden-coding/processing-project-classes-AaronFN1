@@ -3,15 +3,14 @@ import java.util.*;
 import processing.core.PApplet;
 
 public class Laserbeam {
-    float x;
-    float y;
-    ArrayList<Laser> lasers;
+    private ArrayList<Laser> lasers;
+    private ArrayList<Asteroid> asteroids;
     PApplet canvas;
 
-    public Laserbeam(Ship ship, Laser laser, PApplet c) {
+    public Laserbeam(Ship ship, Laser laser, ArrayList<Asteroid> a, PApplet c) {
         canvas = c;
         lasers = new ArrayList<>();
-
+        asteroids = a;
         for (int l = 0; l < 10; l++) {
             laser = new Laser(ship.getX() + 4 * l * canvas.sin(ship.getRotation()),
                     ship.getY() - 4 * l * canvas.cos(ship.getRotation()), ship.getRotation(), ship.getSpeed(), canvas);
@@ -48,4 +47,19 @@ public class Laserbeam {
         Laser laser = lasers.get(0);
         return laser.getY();
     }
+
+    public float laserAsteroidDistance(float asteroidX, float asteroidY){
+        float minDistance = 100;
+        for (int l = 0; l < lasers.size(); l++){
+            Laser laser = lasers.get(l);
+            float x = laser.getX();
+            float y = laser.getY();
+            float distance = canvas.dist(x, y, asteroidX, asteroidY);
+            if (distance<minDistance){
+                minDistance = distance;
+            }
+        }
+        return minDistance;
+    }
+
 }

@@ -9,6 +9,7 @@ public class App extends PApplet {
 
     Ship ship;
     Laser laser;
+    Asteroid asteroid;
     // ArrayList<Laser> lasers = new ArrayList<>();
     ArrayList<Asteroid> asteroids = new ArrayList<>();
     ArrayList<Laserbeam> laserbeams = new ArrayList<>();
@@ -51,18 +52,24 @@ public class App extends PApplet {
 
         for (int i = 0; i < laserbeams.size(); i++) {
             Laserbeam l = laserbeams.get(i);
-            if (play) {
+            // if (play) {
             l.shoot();
-            }
+            // }
             l.display();
             for (int a = 0; a < asteroids.size(); a++) {
                 Asteroid r = asteroids.get(a);
-                if (r.colllide(l.getX(), l.getY())) {
-                    laserbeams.remove(l);
-                    asteroids.remove(r);
-                    for (int n = 0; n < 2; n++)
-                        asteroids.add(
-                                new Asteroid(r.getX(), r.getY(), r.getSpeed(), r.getSize() / 2, random(TWO_PI), this));
+                float laserbeamDistance = l.laserAsteroidDistance(r.getX(), r.getY());
+                if (r.colllide(laserbeamDistance)) {
+                    if (r.getSize() >= r.getViableSize()) {
+                        laserbeams.remove(l);
+                    }
+                    if (r.getSize() > r.getSmallestSize()) {
+                        asteroids.remove(r);
+                        for (int n = 0; n < 2; n++)
+                            asteroids.add(
+                                    new Asteroid(r.getX(), r.getY(), r.getSpeed(), r.getSize() / 2, random(TWO_PI),
+                                            this));
+                    }
                 }
             }
         }
@@ -83,7 +90,7 @@ public class App extends PApplet {
         }
         if (shooting) {
             if (!justShot) {
-                Laserbeam laserbeam = new Laserbeam(ship, laser, this);
+                Laserbeam laserbeam = new Laserbeam(ship, laser, asteroids, this);
                 laserbeams.add(laserbeam);
                 justShot = true;
             }
@@ -130,7 +137,7 @@ public class App extends PApplet {
                 Asteroid asteroid = new Asteroid(startX, startY, speed, size, angle, this);
                 asteroids.add(asteroid);
             }
-            
+
         }
     }
 
