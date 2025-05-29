@@ -50,7 +50,7 @@ public class Asteroid {
         }
         else{
             canvas.strokeWeight(3);
-            canvas.stroke(150);
+            canvas.stroke(50);
             canvas.noFill();
         }
         canvas.circle(x, y, size);

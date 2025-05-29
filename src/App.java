@@ -22,20 +22,15 @@ public class App extends PApplet {
     boolean play = true;
     boolean justShot = false;
     boolean outsideAsteroid;
-    boolean previousOutsideAsteroid = true;
+    boolean previousOutsideAsteroid = false;
+    int score = 0;
     int scene;
 
     public void setup() {
         background(0);
-        ship = new Ship(600, 400, .2, 35, 35, 75, this);
+        ship = new Ship(600, 400, .18, 35, 35, 75, this);
         for (int i = 0; i < 5; i++) {
-            float startX = randomX();
-            float startY = randomY();
-            float speed = random(1, 4);
-            float size = random(50, 100);
-            float angle = random(TWO_PI);
-            Asteroid asteroid = new Asteroid(startX, startY, speed, size, angle, this);
-            asteroids.add(asteroid);
+            asteroidMaker(0);
         }
     }
 
@@ -63,9 +58,12 @@ public class App extends PApplet {
         }
         previousOutsideAsteroid = outsideAsteroid;
 
-        textAlign(RIGHT);
+        textAlign(LEFT);
         textSize(30);
-        text(ship.getLives(), 1150, 50);
+        fill(255);
+        text("Lives: " + ship.getLives(), 10, 30);
+        textAlign(RIGHT);
+        text("Score: " + score, 1190, 30);
 
         for (int i = 0; i < laserbeams.size(); i++) {
             Laserbeam l = laserbeams.get(i);
@@ -79,13 +77,17 @@ public class App extends PApplet {
                 if (r.colllide(laserbeamDistance)) {
                     if (r.getSize() >= r.getViableSize()) {
                         laserbeams.remove(l);
+                        score++;
+                        if (score % 7 == 0) {
+                            asteroidMaker(1);
+                        }
                     }
                     if (r.getSize() > r.getSmallestSize()) {
                         asteroids.remove(r);
                         for (int n = 0; n < 2; n++) {
                             float speed;
                             if (r.getSize() > r.getViableSize()) {
-                                speed = r.getSpeed() + (float) 0.5;
+                                speed = r.getSpeed() + (float) 0.7;
                             } else {
                                 speed = r.getSpeed();
                             }
@@ -103,6 +105,9 @@ public class App extends PApplet {
         ship.display();
         // if (play) {
         ship.movement();
+        // if (upPressed && !rotating) {
+        //     ship.moveUp();
+        // }
         if (upPressed) {
             ship.moveUp();
         }
@@ -149,26 +154,13 @@ public class App extends PApplet {
             shooting = true;
         }
         if (key == 'r') {
-            // for (int a = 0; a < asteroids.size(); a++) {
-            // Asteroid r = asteroids.get(a);
-            // asteroids.remove(r);
-            // }
             asteroids.removeAll(asteroids);
-            // for (int i = 0; i < laserbeams.size(); i++) {
-            // Laserbeam l = laserbeams.get(i);
-            // laserbeams.remove(l);
-            // }
             laserbeams.removeAll(laserbeams);
             for (int i = 0; i < 5; i++) {
-                float startX = randomX();
-                float startY = randomY();
-                float speed = random(1, 3);
-                float size = random(40, 70);
-                float angle = random(TWO_PI);
-                Asteroid asteroid = new Asteroid(startX, startY, speed, size, angle, this);
-                asteroids.add(asteroid);
+                asteroidMaker(0);
             }
-            ship.damage(-5 + ship.getLives());
+            ship.reset();
+            score = 0;
             play = true;
         }
     }
@@ -200,5 +192,43 @@ public class App extends PApplet {
 
     public float randomY() {
         return random(800);
+    }
+
+    public void asteroidMaker(int position) {
+        float startX = randomX();
+        float startY = randomY();
+        if (position == 1) {
+            float side = Math.round(random(1));
+            float xSide = 0;
+            float ySide = 0;
+            if (side == 0){
+                xSide = Math.round(random(1,2));
+            }
+            else{
+                ySide = Math.round(random(1,2));
+            }
+            
+            if (xSide == 1){
+                // startX = random(5);
+                startX = 0;
+            }
+            if (xSide == 2){
+                // startX = random(1195, 1200);
+                startX = 1200;
+            }
+            if (ySide == 1){
+                // startX = random(5);
+                startY = 0;
+            }
+            if (ySide == 2){
+                // startY = random(795, 800);
+                startY = 800;
+            }
+        }
+        float speed = random(1, 4);
+        float size = random(120, 180);
+        float angle = random(TWO_PI);
+        Asteroid asteroid = new Asteroid(startX, startY, speed, size, angle, this);
+        asteroids.add(asteroid);
     }
 }

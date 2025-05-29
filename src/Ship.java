@@ -10,7 +10,6 @@ public class Ship {
     private float rotationAngle;
     private double friction;
     private int lives;
-    private boolean insideAsteroid;
 
     public Ship(int shipX, int shipY, double shipVelocity, double shipMaxVelocity,
             int shipXSize, int shipYSize, PApplet c) {
@@ -26,7 +25,6 @@ public class Ship {
         rotationAngle = 0;
         friction = 0.995;
         lives = 5;
-        insideAsteroid = false;
     }
 
     public void display() {
@@ -41,21 +39,23 @@ public class Ship {
         canvas.rectMode(PApplet.CENTER);
         canvas.rect(0, 0, xSize, ySize);
 
+        canvas.noStroke();
+        canvas.fill(255, 0, 0);
+        float tipY = -ySize / 2 - (ySize / 10f) / 2;
+        canvas.rect(0, tipY, xSize / 3.5f, ySize / 10f);
+
         canvas.popMatrix();
     }
 
-    // public void reset(){
-    // x = 0;
-    // y = 0;
-    // velocity = (float) shipVelocity;
-    // maxVelocity = (float) shipMaxVelocity;
-    // xSize = shipXSize;
-    // ySize = shipYSize;
-    // xVelocity = 0;
-    // yVelocity = 0;
-    // rotationAngle = 0;
-    // friction = 0.995;
-    // }
+    public void reset() {
+        x = 600;
+        y = 400;
+        xVelocity = 0;
+        yVelocity = 0;
+        rotationAngle = 0;
+        friction = 0.995;
+        lives = 5;
+    }
 
     public void moveUp() {
         float angle = rotationAngle - PApplet.HALF_PI;
@@ -65,8 +65,8 @@ public class Ship {
     }
 
     public void brake() {
-        xVelocity *= 0.95;
-        yVelocity *= 0.95;
+        xVelocity *= 0.90;
+        yVelocity *= 0.90;
 
         if (canvas.abs(xVelocity) < 0.05)
             xVelocity = 0;
@@ -75,11 +75,11 @@ public class Ship {
     }
 
     public void rotateLeft() {
-        rotationAngle -= 0.05f;
+        rotationAngle -= 0.06f;
     }
 
     public void rotateRight() {
-        rotationAngle += 0.05f;
+        rotationAngle += 0.06f;
     }
 
     public void movement() {
@@ -114,14 +114,14 @@ public class Ship {
 
     public void damage(int life) {
         // if (!insideAsteroid) {
-        //     insideAsteroid = true;
-            lives -= life;
+        // insideAsteroid = true;
+        lives -= life;
         // }
 
     }
 
     // public void beingDamaged(boolean damage) {
-    //     insideAsteroid = damage;
+    // insideAsteroid = damage;
     // }
 
     public int getLives() {
