@@ -31,6 +31,9 @@ public class Laserbeam {
         for (int l = 0; l < lasers.size(); l++) {
             Laser laser = lasers.get(l);
             laser.shoot();
+            if (laser.isOffScreen()) {
+                lasers.remove(l);
+            }
         }
     }
 
@@ -48,18 +51,20 @@ public class Laserbeam {
         return laser.getY();
     }
 
-    public float laserAsteroidDistance(float asteroidX, float asteroidY){
-        float minDistance = 100;
-        for (int l = 0; l < lasers.size(); l++){
+    public float laserAsteroidDistance(float asteroidX, float asteroidY) {
+        float minDistance = 1000;
+        for (int l = 0; l < lasers.size(); l++) {
             Laser laser = lasers.get(l);
             float x = laser.getX();
             float y = laser.getY();
             float distance = canvas.dist(x, y, asteroidX, asteroidY);
-            if (distance<minDistance){
+            if (distance < minDistance) {
                 minDistance = distance;
             }
         }
         return minDistance;
     }
+
+    public boolean isOffScreen;
 
 }

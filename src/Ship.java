@@ -9,6 +9,8 @@ public class Ship {
     private int xSize, ySize;
     private float rotationAngle;
     private double friction;
+    private int lives;
+    private boolean insideAsteroid;
 
     public Ship(int shipX, int shipY, double shipVelocity, double shipMaxVelocity,
             int shipXSize, int shipYSize, PApplet c) {
@@ -23,6 +25,8 @@ public class Ship {
         yVelocity = 0;
         rotationAngle = 0;
         friction = 0.995;
+        lives = 5;
+        insideAsteroid = false;
     }
 
     public void display() {
@@ -41,16 +45,16 @@ public class Ship {
     }
 
     // public void reset(){
-    //     x = 0;
-    //     y = 0;
-    //     velocity = (float) shipVelocity;
-    //     maxVelocity = (float) shipMaxVelocity;
-    //     xSize = shipXSize;
-    //     ySize = shipYSize;
-    //     xVelocity = 0;
-    //     yVelocity = 0;
-    //     rotationAngle = 0;
-    //     friction = 0.995;
+    // x = 0;
+    // y = 0;
+    // velocity = (float) shipVelocity;
+    // maxVelocity = (float) shipMaxVelocity;
+    // xSize = shipXSize;
+    // ySize = shipYSize;
+    // xVelocity = 0;
+    // yVelocity = 0;
+    // rotationAngle = 0;
+    // friction = 0.995;
     // }
 
     public void moveUp() {
@@ -108,6 +112,22 @@ public class Ship {
         }
     }
 
+    public void damage(int life) {
+        // if (!insideAsteroid) {
+        //     insideAsteroid = true;
+            lives -= life;
+        // }
+
+    }
+
+    // public void beingDamaged(boolean damage) {
+    //     insideAsteroid = damage;
+    // }
+
+    public int getLives() {
+        return lives;
+    }
+
     public float getSpeed() {
         return PApplet.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
     }
@@ -122,5 +142,30 @@ public class Ship {
 
     public float getRotation() {
         return rotationAngle;
+    }
+
+    public float Distance(float asteroidX, float asteroidY) {
+        // Step 1: Translate asteroid relative to ship
+        float dx = asteroidX - x;
+        float dy = asteroidY - y;
+
+        // Step 2: Rotate asteroid point into ship's local coordinate system
+        float unrotatedX = dx * PApplet.cos(-rotationAngle) - dy * PApplet.sin(-rotationAngle);
+        float unrotatedY = dx * PApplet.sin(-rotationAngle) + dy * PApplet.cos(-rotationAngle);
+
+        // Step 3: Clamp to the ship's rectangle edges
+        float halfW = xSize / 2f;
+        float halfH = ySize / 2f;
+        float clampedX = PApplet.constrain(unrotatedX, -halfW, halfW);
+        float clampedY = PApplet.constrain(unrotatedY, -halfH, halfH);
+
+        // Step 4: Convert clamped point back to global coordinates
+        float rotatedX = clampedX * PApplet.cos(rotationAngle) - clampedY * PApplet.sin(rotationAngle);
+        float rotatedY = clampedX * PApplet.sin(rotationAngle) + clampedY * PApplet.cos(rotationAngle);
+        float closestX = x + rotatedX;
+        float closestY = y + rotatedY;
+
+        // Step 5: Return distance from asteroid to closest point on ship
+        return canvas.dist(asteroidX, asteroidY, closestX, closestY);
     }
 }
