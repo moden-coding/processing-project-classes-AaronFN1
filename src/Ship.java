@@ -112,7 +112,7 @@ public class Ship {
         }
     }
 
-    public void damage(int life) {
+    public void damage(float life) {
         // if (!insideAsteroid) {
         // insideAsteroid = true;
         lives -= life;
