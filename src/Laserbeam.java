@@ -31,9 +31,6 @@ public class Laserbeam {
         for (int l = 0; l < lasers.size(); l++) {
             Laser laser = lasers.get(l);
             laser.shoot();
-            if (laser.isOffScreen()) {
-                lasers.remove(l);
-            }
         }
     }
 
@@ -65,6 +62,16 @@ public class Laserbeam {
         return minDistance;
     }
 
-    public boolean isOffScreen;
-
+    public boolean isOffScreen(){
+        Laser l = lasers.get(lasers.size()-1);
+            if (l.getX()<0||l.getX()>1200){
+                return true;
+            }
+            else if (l.getY()<0||l.getY()>800){
+                return true;
+            }
+            else{
+                return false;
+            }
+    }
 }

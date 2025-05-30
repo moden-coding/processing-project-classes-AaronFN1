@@ -29,7 +29,8 @@ public class App extends PApplet {
     boolean outsideAsteroid;
     boolean previousOutsideAsteroid = false;
     boolean cheeseMode = false;
-    int highscore;
+    boolean cheeseModeTurnedOn = false;
+    ArrayList<Integer> highscore = new ArrayList<>();
     int score = 0;
     int scene = 1;
     String dieMessage = "You lose :(";
@@ -44,9 +45,12 @@ public class App extends PApplet {
     }
 
     public void draw() {
+        System.out.println("laser " + laserbeams.size());
+        System.out.println("asteroids " + asteroids.size());
         background(0);
         outsideAsteroid = true;
         if (scene == 1) {
+            cheeseMode = false;
             asteroids.removeAll(asteroids);
             laserbeams.removeAll(laserbeams);
             for (int i = 0; i < 5; i++) {
@@ -90,6 +94,9 @@ public class App extends PApplet {
                     l.shoot();
                 }
                 l.display();
+                if (l.isOffScreen()) {
+                    laserbeams.remove(l);
+                }
                 for (int a = 0; a < asteroids.size(); a++) {
                     Asteroid r = asteroids.get(a);
                     float laserbeamDistance = l.laserAsteroidDistance(r.getX(), r.getY());
@@ -169,36 +176,84 @@ public class App extends PApplet {
             }
         }
         if (scene == 3) {
-            // highscore checking
+
             textAlign(CENTER);
             fill(255);
+            textSize(50);
+            text("Score: " + score, 600, 300);
+            getHighscores();
+            if (!cheeseModeTurnedOn) {
+                newHighscore();
+                cheeseModeTurnedOn = false;
+            }
+            saveHighscores();
+            text(dieMessage, 600, 250);
             textSize(40);
-            text("Score: " + score, 600, 350);
+            text("Highscore: " + highscore.get(0), 600, 350);
+            text("Second:  " + highscore.get(1), 600, 390);
+            text("Third: " + highscore.get(2), 600, 430);
+            text("Fourth: " + highscore.get(3), 600, 470);
+            text("Fifth: " + highscore.get(4), 600, 510);
+            textSize(30);
+            text("Click to retry.", 600, 560);
+        }
+    }
+
+    boolean getHighscoresProcessed = false;
+
+    public void getHighscores() {
+        if (!getHighscoresProcessed) {
             try (Scanner scanner = new Scanner(Paths.get("Highscores.txt"))) {
 
                 while (scanner.hasNextLine()) {
                     String savedHighscore = scanner.nextLine();
-                    highscore = Integer.valueOf(savedHighscore);
+                    highscore.add(Integer.valueOf(savedHighscore));
                 }
+                getHighscoresProcessed = true;
+
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
-            if (score > highscore) {
-                highscore = score;
-                dieMessage = "New highscore!";
-                try (PrintWriter writer = new PrintWriter("Highscores.txt")) {
-                    writer.println(highscore); // Writes the integer to the file
-                    writer.close(); // Closes the writer and saves the file
-                } catch (IOException e) {
-                    System.out.println("An error occurred while writing to the file.");
-                    e.printStackTrace();
+        }
+    }
+
+    boolean newHighscoreProcessed = false;
+    boolean newHighscore = false;
+
+    public void newHighscore() {
+        if (!newHighscoreProcessed) {
+            for (int i = 0; i < highscore.size(); i++) {
+                if (score > highscore.get(i)) {
+                    if (!newHighscore) {
+                        highscore.add(i, score);
+                        newHighscore = true;
+                        if (i > 0) {
+                            dieMessage = "Top 5!";
+                        }
+                        if (i == 0) {
+                            dieMessage = "New Highscore!!";
+                        }
+                    }
                 }
 
             }
-            text(dieMessage, 600, 300);
-            text("Highscore: " + highscore, 600, 400);
-            textSize(30);
-            text("Click to retry.", 600, 450);
+            newHighscoreProcessed = true;
+        }
+    }
+
+    boolean saveHighscoresProcessed = false;
+
+    public void saveHighscores() {
+        if (!saveHighscoresProcessed) {
+            try (PrintWriter writer = new PrintWriter("Highscores.txt")) {
+                for (int i = 0; i < 5; i++) {
+                    writer.write(String.valueOf(highscore.get(i)) + "\n");
+                }
+                saveHighscoresProcessed = true;
+            } catch (IOException e) {
+                System.out.println("An error occurred while writing to the file.");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -239,11 +294,13 @@ public class App extends PApplet {
                 }
                 ship.reset();
                 score = 0;
+                cheeseMode = false;
                 play = true;
             }
         }
         if (key == 'c') {
             cheeseMode = !cheeseMode;
+            cheeseModeTurnedOn = true;
         }
     }
 
