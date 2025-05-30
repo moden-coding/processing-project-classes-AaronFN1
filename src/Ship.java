@@ -10,7 +10,8 @@ public class Ship {
     private float rotationAngle;
     private double friction;
     private int lives;
-
+    private int shipColor;
+    
     public Ship(int shipX, int shipY, double shipVelocity, double shipMaxVelocity,
             int shipXSize, int shipYSize, PApplet c) {
         canvas = c;
@@ -25,6 +26,7 @@ public class Ship {
         rotationAngle = 0;
         friction = 0.995;
         lives = 5;
+        shipColor = canvas.color(255);
     }
 
     public void display() {
@@ -32,7 +34,7 @@ public class Ship {
         canvas.translate(x, y);
         canvas.rotate(rotationAngle);
 
-        canvas.fill(255);
+        canvas.fill(shipColor);
         canvas.stroke(255);
         canvas.strokeWeight(2);
 
@@ -61,6 +63,13 @@ public class Ship {
         float angle = rotationAngle - PApplet.HALF_PI;
         xVelocity += Math.cos(angle) * velocity;
         yVelocity += Math.sin(angle) * velocity;
+        limitSpeed();
+    }
+
+    public void moveDown() {
+        float angle = rotationAngle - PApplet.HALF_PI;
+        xVelocity -= Math.cos(angle) * velocity;
+        yVelocity -= Math.sin(angle) * velocity;
         limitSpeed();
     }
 
@@ -112,6 +121,14 @@ public class Ship {
         }
     }
 
+    public void damageFlash(boolean outsideAsteroid){
+        if (outsideAsteroid == false){
+            shipColor = canvas.color(255, 0, 0);
+        }
+        else{
+            shipColor = canvas.color(255);
+        }
+    }
     public void damage(float life) {
         // if (!insideAsteroid) {
         // insideAsteroid = true;

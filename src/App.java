@@ -1,4 +1,8 @@
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import processing.core.*;
 
@@ -15,6 +19,7 @@ public class App extends PApplet {
     ArrayList<Laserbeam> laserbeams = new ArrayList<>();
     boolean upPressed;
     boolean downPressed;
+    boolean tabOrEnterPressed;
     boolean leftPressed;
     boolean rightPressed;
     boolean rotating;
@@ -24,15 +29,14 @@ public class App extends PApplet {
     boolean outsideAsteroid;
     boolean previousOutsideAsteroid = false;
     boolean cheeseMode = false;
+    int highscore;
     int score = 0;
-    int scene;
+    int scene = 1;
+    String dieMessage = "You lose :(";
 
     public void setup() {
         background(0);
         ship = new Ship(600, 400, .18, 35, 35, 75, this);
-        for (int i = 0; i < 5; i++) {
-            asteroidMaker(0);
-        }
     }
 
     public void settings() {
@@ -42,116 +46,167 @@ public class App extends PApplet {
     public void draw() {
         background(0);
         outsideAsteroid = true;
-        for (int a = 0; a < asteroids.size(); a++) {
-            Asteroid r = asteroids.get(a);
-            r.display();
-            if (play) {
-                r.movement();
+        if (scene == 1) {
+            asteroids.removeAll(asteroids);
+            laserbeams.removeAll(laserbeams);
+            for (int i = 0; i < 5; i++) {
+                asteroidMaker(0);
             }
-            if (r.getSize() >= r.getViableSize()) {
-                if (ship.Distance(r.getX(), r.getY()) <= r.getSize() / 2) {
-                    outsideAsteroid = false;
-                }
-            }
+            ship.reset();
+            score = 0;
+            scene = 2;
+            play = true;
         }
-        if (outsideAsteroid == false && previousOutsideAsteroid == true) {
-            // if (cheeseMode == false) {
-                ship.damage(1);
-            // }
-        }
-        previousOutsideAsteroid = outsideAsteroid;
-
-        textAlign(LEFT);
-        textSize(30);
-        fill(255);
-        text("Lives: " + ship.getLives(), 10, 30);
-        textAlign(RIGHT);
-        text("Score: " + score, 1190, 30);
-
-        for (int i = 0; i < laserbeams.size(); i++) {
-            Laserbeam l = laserbeams.get(i);
-            // if (play) {
-            l.shoot();
-            // }
-            l.display();
+        if (scene == 2) {
             for (int a = 0; a < asteroids.size(); a++) {
                 Asteroid r = asteroids.get(a);
-                float laserbeamDistance = l.laserAsteroidDistance(r.getX(), r.getY());
-                if (r.colllide(laserbeamDistance)) {
-                    if (r.getSize() >= r.getViableSize()) {
-                        if (cheeseMode == false) {
-                            laserbeams.remove(l);
-                        }
-                        score++;
-                        if (!cheeseMode) {
-                            if (score % 7 == 0) {
-                                asteroidMaker(1);
-                            }
-                        }
-                        if (cheeseMode) {
-                            if (score % 7 == 0) {
-                                asteroidMaker(1);
-                            }
-                        }
-                        if (score % 10 == 0) {
-                            ship.damage(-1);
-                        }
-                    }
-                    if (r.getSize() > r.getSmallestSize()) {
-                        asteroids.remove(r);
-                        for (int n = 0; n < 2; n++) {
-                            float speed;
-                            if (r.getSize() > r.getViableSize()) {
-                                speed = r.getSpeed() + (float) 0.7;
-                                asteroids.add(
-                                        new Asteroid(r.getX(), r.getY(), speed, r.getSize() / 2, random(TWO_PI),
-                                                this));
-                            }
-                        }
+                r.display();
+                if (play) {
+                    r.movement();
+                }
+                if (r.getSize() >= r.getViableSize()) {
+                    if (ship.Distance(r.getX(), r.getY()) <= r.getSize() / 2) {
+                        outsideAsteroid = false;
                     }
                 }
             }
-        }
-        if (ship.getLives() <= 0) {
-            play = false;
-        }
-        ship.display();
-        // if (play) {
-        ship.movement();
-        // if (upPressed && !rotating) {
-        // ship.moveUp();
-        if (upPressed) {
-            ship.moveUp();
-        }
-        if (downPressed) {
-            ship.brake();
-        }
-        if (leftPressed) {
-            ship.rotateLeft();
-        }
-        if (rightPressed) {
-            ship.rotateRight();
-        }
-        if (shooting) {
-            if (cheeseMode == false) {
-                if (!justShot) {
-                    Laserbeam laserbeam = new Laserbeam(ship, laser, asteroids, this);
-                    laserbeams.add(laserbeam);
-                    justShot = true;
-                }
+            if (outsideAsteroid == false && previousOutsideAsteroid == true) {
+                // if (cheeseMode == false) {
+                ship.damage(1);
+                // }
             }
-            if (cheeseMode) {
-                Laserbeam laserbeam = new Laserbeam(ship, laser, asteroids, this);
-                laserbeams.add(laserbeam);
-                justShot = true;
-            }
-        }
-        // }
+            previousOutsideAsteroid = outsideAsteroid;
 
+            textAlign(LEFT);
+            textSize(30);
+            fill(255);
+            text("Lives: " + ship.getLives(), 10, 30);
+            textAlign(RIGHT);
+            text("Score: " + score, 1190, 30);
+
+            for (int i = 0; i < laserbeams.size(); i++) {
+                Laserbeam l = laserbeams.get(i);
+                if (play) {
+                    l.shoot();
+                }
+                l.display();
+                for (int a = 0; a < asteroids.size(); a++) {
+                    Asteroid r = asteroids.get(a);
+                    float laserbeamDistance = l.laserAsteroidDistance(r.getX(), r.getY());
+                    if (r.colllide(laserbeamDistance)) {
+                        if (r.getSize() >= r.getViableSize()) {
+                            if (cheeseMode == false) {
+                                laserbeams.remove(l);
+                            }
+                            score++;
+                            if (!cheeseMode) {
+                                if (score % 7 == 0) {
+                                    asteroidMaker(1);
+                                }
+                            }
+                            if (cheeseMode) {
+                                if (score % 7 == 0) {
+                                    asteroidMaker(1);
+                                }
+                            }
+                            if (score % 10 == 0) {
+                                ship.damage(-1);
+                            }
+                        }
+                        if (r.getSize() > r.getSmallestSize()) {
+                            asteroids.remove(r);
+                            for (int n = 0; n < 2; n++) {
+                                float speed;
+                                if (r.getSize() > r.getViableSize()) {
+                                    speed = r.getSpeed() + (float) 0.7;
+                                    asteroids.add(
+                                            new Asteroid(r.getX(), r.getY(), speed, r.getSize() / 2, random(TWO_PI),
+                                                    this));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (ship.getLives() <= 0) {
+                scene = 3;
+            }
+            ship.damageFlash(outsideAsteroid);
+            ship.display();
+            if (play) {
+                ship.movement();
+                // if (upPressed && !rotating) {
+                // ship.moveUp();
+                if (upPressed) {
+                    ship.moveUp();
+                }
+                if (downPressed) {
+                    ship.moveDown();
+                }
+                if (tabOrEnterPressed) {
+                    ship.brake();
+                }
+                if (leftPressed) {
+                    ship.rotateLeft();
+                }
+                if (rightPressed) {
+                    ship.rotateRight();
+                }
+                if (shooting) {
+                    if (cheeseMode == false) {
+                        if (!justShot) {
+                            Laserbeam laserbeam = new Laserbeam(ship, laser, asteroids, this);
+                            laserbeams.add(laserbeam);
+                            justShot = true;
+                        }
+                    }
+                    if (cheeseMode) {
+                        Laserbeam laserbeam = new Laserbeam(ship, laser, asteroids, this);
+                        laserbeams.add(laserbeam);
+                        justShot = true;
+                    }
+                }
+            }
+        }
+        if (scene == 3) {
+            // highscore checking
+            textAlign(CENTER);
+            fill(255);
+            textSize(40);
+            text("Score: " + score, 600, 350);
+            try (Scanner scanner = new Scanner(Paths.get("Highscores.txt"))) {
+
+                while (scanner.hasNextLine()) {
+                    String savedHighscore = scanner.nextLine();
+                    highscore = Integer.valueOf(savedHighscore);
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+            if (score > highscore) {
+                highscore = score;
+                dieMessage = "New highscore!";
+                try (PrintWriter writer = new PrintWriter("Highscores.txt")) {
+                    writer.println(highscore); // Writes the integer to the file
+                    writer.close(); // Closes the writer and saves the file
+                } catch (IOException e) {
+                    System.out.println("An error occurred while writing to the file.");
+                    e.printStackTrace();
+                }
+
+            }
+            text(dieMessage, 600, 300);
+            text("Highscore: " + highscore, 600, 400);
+            textSize(30);
+            text("Click to retry.", 600, 450);
+        }
     }
 
     public void mousePressed() {
         play = !play;
+        if (scene == 3) {
+            scene = 1;
+        }
     }
 
     public void keyPressed() {
@@ -169,18 +224,23 @@ public class App extends PApplet {
             rightPressed = true;
             rotating = true;
         }
+        if (keyCode == ENTER || keyCode == TAB) {
+            tabOrEnterPressed = true;
+        }
         if (key == ' ') {
             shooting = true;
         }
         if (key == 'r') {
-            asteroids.removeAll(asteroids);
-            laserbeams.removeAll(laserbeams);
-            for (int i = 0; i < 5; i++) {
-                asteroidMaker(0);
+            if (scene == 2) {
+                asteroids.removeAll(asteroids);
+                laserbeams.removeAll(laserbeams);
+                for (int i = 0; i < 5; i++) {
+                    asteroidMaker(0);
+                }
+                ship.reset();
+                score = 0;
+                play = true;
             }
-            ship.reset();
-            score = 0;
-            play = true;
         }
         if (key == 'c') {
             cheeseMode = !cheeseMode;
@@ -201,6 +261,9 @@ public class App extends PApplet {
         if (key == 'd' || keyCode == RIGHT) {
             rightPressed = false;
             rotating = false;
+        }
+        if (keyCode == ENTER || keyCode == TAB) {
+            tabOrEnterPressed = false;
         }
         if (key == ' ') {
             shooting = false;
