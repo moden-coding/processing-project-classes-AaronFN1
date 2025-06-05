@@ -11,6 +11,7 @@ public class App extends PApplet {
         PApplet.main("App");
     }
 
+    //declaring variables
     Ship ship;
     Laser laser;
     Asteroid asteroid;
@@ -45,10 +46,9 @@ public class App extends PApplet {
     }
 
     public void draw() {
-        System.out.println("laser " + laserbeams.size());
-        System.out.println("asteroids " + asteroids.size());
         background(0);
         outsideAsteroid = true;
+        //setup
         if (scene == 1) {
             cheeseMode = false;
             asteroids.removeAll(asteroids);
@@ -61,19 +61,27 @@ public class App extends PApplet {
             scene = 2;
             play = true;
         }
+        //actual game
         if (scene == 2) {
+            //moving the asteroids and damage checking
             for (int a = 0; a < asteroids.size(); a++) {
                 Asteroid r = asteroids.get(a);
                 r.display();
                 if (play) {
                     r.movement();
                 }
+
+                // if(r.insideShip(ship)){
+                //     outsideAsteroid = false;
+                // }
+
                 if (r.getSize() >= r.getViableSize()) {
                     if (ship.Distance(r.getX(), r.getY()) <= r.getSize() / 2) {
                         outsideAsteroid = false;
                     }
                 }
             }
+            //damage
             if (outsideAsteroid == false && previousOutsideAsteroid == true) {
                 // if (cheeseMode == false) {
                 ship.damage(1);
@@ -81,13 +89,15 @@ public class App extends PApplet {
             }
             previousOutsideAsteroid = outsideAsteroid;
 
+            //text on screen
             textAlign(LEFT);
             textSize(30);
             fill(255);
             text("Lives: " + ship.getLives(), 10, 30);
             textAlign(RIGHT);
             text("Score: " + score, 1190, 30);
-
+            
+            //lasers to display and check if they hit an asteroid
             for (int i = 0; i < laserbeams.size(); i++) {
                 Laserbeam l = laserbeams.get(i);
                 if (play) {
@@ -97,6 +107,7 @@ public class App extends PApplet {
                 if (l.isOffScreen()) {
                     laserbeams.remove(l);
                 }
+                //checking if it hit an asteroid
                 for (int a = 0; a < asteroids.size(); a++) {
                     Asteroid r = asteroids.get(a);
                     float laserbeamDistance = l.laserAsteroidDistance(r.getX(), r.getY());
@@ -106,6 +117,7 @@ public class App extends PApplet {
                                 laserbeams.remove(l);
                             }
                             score++;
+                            //making new asteroids after destroying old ones
                             if (!cheeseMode) {
                                 if (score % 7 == 0) {
                                     asteroidMaker(1);
@@ -135,11 +147,13 @@ public class App extends PApplet {
                     }
                 }
             }
+            //losing
             if (ship.getLives() <= 0) {
                 scene = 3;
             }
             ship.damageFlash(outsideAsteroid);
             ship.display();
+            //moving the ship
             if (play) {
                 ship.movement();
                 // if (upPressed && !rotating) {
@@ -176,7 +190,7 @@ public class App extends PApplet {
             }
         }
         if (scene == 3) {
-
+            //scores and such
             textAlign(CENTER);
             fill(255);
             textSize(50);
@@ -201,6 +215,7 @@ public class App extends PApplet {
 
     boolean getHighscoresProcessed = false;
 
+    //getting and setting highscores
     public void getHighscores() {
         if (!getHighscoresProcessed) {
             try (Scanner scanner = new Scanner(Paths.get("Highscores.txt"))) {
@@ -256,7 +271,8 @@ public class App extends PApplet {
             }
         }
     }
-
+    
+    //pause key
     public void mousePressed() {
         play = !play;
         if (scene == 3) {
@@ -264,6 +280,7 @@ public class App extends PApplet {
         }
     }
 
+    //controls
     public void keyPressed() {
         if (key == 'w' || keyCode == UP) {
             upPressed = true;
@@ -336,6 +353,7 @@ public class App extends PApplet {
         return random(800);
     }
 
+    //creating an asteroid
     public void asteroidMaker(int position) {
         float startX = randomX();
         float startY = randomY();
